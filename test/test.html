@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <title>node.websocket.js test</title>
+    
+    <style type="text/css" media="screen">
+      #time { background: #ccc; }
+    </style>
+  </head>
+  <body>
+    
+    <h1><a href="http://github.com/Guille/node.websocket">node.websocket.js</a> demo</h1>
+    
+    <h2>The time is <span id="time">opening socket</span></h2>
+    <p>The information for the time is provided by the server. No Date() or intervals here!</p>
+    
+    <script>
+        var webSocket = new WebSocket('ws://localhost:8000/time');
+
+        webSocket.onopen = function(event){
+            document.getElementById('time').innerHTML = 'waiting for socket';
+            webSocket.send('start');
+        };
+
+        webSocket.onmessage = function(event){
+            var object = JSON.parse(event.data);
+            document.getElementById('time').innerHTML = object.time;
+        };
+
+        webSocket.onclose = function(event){
+            document.getElementById('time').innerHTML = 'socket closed';
+        };
+    </script>
+    
+  </body>
+</html>
