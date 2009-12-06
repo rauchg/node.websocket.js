@@ -15,7 +15,7 @@
     <p>The information for the time is provided by the server. No Date() or intervals here!</p>
     
     <script>
-        var webSocket = new WebSocket('ws://localhost:8000/time');
+        var webSocket = new WebSocket('ws://localhost:8080/time');
 
         webSocket.onopen = function(event){
             document.getElementById('time').innerHTML = 'waiting for socket';

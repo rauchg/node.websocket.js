@@ -45,7 +45,7 @@ var tcp = require('tcp'),
     
 Server = this.Server = function(options){
   this.options = tools.merge({
-    port: 8000,
+    port: 8080,
     host: 'localhost',
     origins: '*',
     log: true,

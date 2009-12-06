@@ -18,19 +18,19 @@ Run the server:
 
 	$ node runserver.js
 
-By default, it'll listen on localhost port 8000. node.websocket.js interprets the arguments passed in and turns those into the object passed to the `websocket::Server` constructor:
+By default, it'll listen on localhost port 8080. node.websocket.js interprets the arguments passed in and turns those into the object passed to the `websocket::Server` constructor:
 
-	$ node runserver.js --port='8000' --host='some_other_host' --origins=['http://some_allowed_host']
+	$ node runserver.js --port='8080' --host='some_other_host' --origins=['http://some_allowed_host']
   
 The option values are eval()'d to turn them into native JavaScript types, so don't forget to wrap strings in `' '`.
 
 On the client side, initialize a `WebSocket` like this:
 
-	new WebSocket(ws://localhost:8000/test);
+	new WebSocket(ws://localhost:8080/test);
 
 `websocket::Connection` will try to load a [module](http://nodejs.org/api.html#_modules) in the modules/ directory with the name of the passed resource (in this case `test`).
 
-If the resource is just / (for example `ws://localhost:8000/`), modules/_default.js will be loaded. The module has to expose an onData function like this
+If the resource is just / (for example `ws://localhost:8080/`), modules/_default.js will be loaded. The module has to expose an onData function like this
 
 	this.onData = function(data, instance){
 		// do something 
