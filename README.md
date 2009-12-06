@@ -16,31 +16,31 @@ How to use
 
 Run the server:
 
-  $ node runserver.js
+	$ node runserver.js
 
 By default, it'll listen on localhost port 8000. node.websocket.js interprets the arguments passed in and turns those into the object passed to the `websocket::Server` constructor:
 
-  $ node runserver.js --port='8000' --host='some_other_host' --origins=['http://some_allowed_host']
+	$ node runserver.js --port='8000' --host='some_other_host' --origins=['http://some_allowed_host']
   
 The option values are eval()'d to turn them into native JavaScript types, so don't forget to wrap strings in `' '`.
 
 On the client side, initialize a `WebSocket` like this:
 
-  new WebSocket(ws://localhost:8000/test);
+	new WebSocket(ws://localhost:8000/test);
 
 `websocket::Connection` will try to load a [module](http://nodejs.org/api.html#_modules) in the modules/ directory with the name of the passed resource (in this case `test`).
 
 If the resource is just / (for example `ws://localhost:8000/`), modules/_default.js will be loaded. The module has to expose an onData function like this
 
-  this.onData = function(data, instance){
-    // do something 
-  };
+	this.onData = function(data, instance){
+		// do something 
+	};
   
 The second parameter received is the `websocket::Connection` instance. To send data back to the client your module should do something like this:
 
-  this.onData = function(data, connection){
-    connection.send('sending data!');
-  }
+	this.onData = function(data, connection){
+		connection.send('sending data!');
+	}
   
 Demonstration
 -------------
@@ -49,13 +49,13 @@ Demonstration
 
 In order to run it by yourself, download and compile [redis](http://code.google.com/p/redis/) and run it in a terminal
 
-  $ ./redis-server
+	$ ./redis-server
   
 While redis is simply used for logs storage here (and its not indispensable), I highly encourage you to discover and examine its potential.
 
 In a different terminal, as described above, run node.webserver.js:
 
-  $ node runserver.js
+	$ node runserver.js
   
 Access test/test.html (which you can run locally or deliver through any web server, such as Apache) and watch true realtime data exchange!
 
