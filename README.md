@@ -8,8 +8,12 @@ The end goal of the project is to provide an abstraction layer of the protocol u
 Requirements
 ------------
 
-* [Node.js](http://nodejs.org/) (tested with v0.1.20-3-g5b1a535)
-* [Redis](http://code.google.com/p/redis/) used for logging. [redis-node-client](http://github.com/fictorial/redis-node-client) is included.
+
+* [Node.js](http://nodejs.org/) (tested with v0.1.21)
+
+Optional:
+
+* [Redis](http://code.google.com/p/redis/) used for logging. [redis-node-client](http://github.com/fictorial/redis-node-client) is included. See `log.js` for the benefits of Redis as a logging mechanism.
 
 How to use
 ----------

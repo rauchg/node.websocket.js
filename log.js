@@ -16,7 +16,7 @@ author: [Guillermo Rauch](http://devthought.com)
 
 var sys = require('sys'),
     redis = require('./lib/redis'),
-    ready = false,
+    ready = null,
     busy = false,
     client = new redis.Client(),
     stack = [],
@@ -63,4 +63,6 @@ this.store = function(message, type){
 };
 
 // connect to redis
-client.connect(onConnect);
+client.connect(onConnect, function(){
+  ready = false;
+});
