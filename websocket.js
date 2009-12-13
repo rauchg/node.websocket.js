@@ -22,7 +22,7 @@ var tcp = require('tcp'),
       /^Origin: (.+)$/
     ],
     
-    dataMatch = /^\u0000([^\ufffd]+)\ufffd$/,
+    dataMatch = /^\u0000(.+)\ufffd$/,
     
     // what the response headers should be
     responseHeaders = [
@@ -141,7 +141,11 @@ Connection.prototype._handle = function(data){
     return false;
   }
   
-  this.module.onData(match[1], this);
+  var chunks = data.replace(/^(\u0000)|(\ufffd)$/g, '').split('\ufffd\u0000');
+  for (var i = 0, l = chunks.length; i < l; ++i) { 
+    this.module.onData(chunks[i], this);
+  }
+  
   return true;
 };
 
