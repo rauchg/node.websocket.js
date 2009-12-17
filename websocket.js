@@ -22,8 +22,6 @@ var tcp = require('tcp'),
       /^Origin: (.+)$/
     ],
     
-    dataMatch = /^\u0000(.+)\ufffd$/,
-    
     // what the response headers should be
     responseHeaders = [
       'HTTP/1.1 101 Web Socket Protocol Handshake', 
@@ -60,10 +58,6 @@ Server = this.Server = function(options){
     new Connection(self, socket);    
   });
   this.server.listen(this.options.port, this.options.host);
-  
-  if (this.options.log) setInterval(function(){
-    log(self.clients + ' clients connected', 'info');
-  }, 5000);
 };
 
 Server.prototype._verifyOrigin = function(origin){
@@ -90,6 +84,7 @@ this.Connection = Connection = function(server, socket){
   this.server = server;
   this.socket = socket;
   this.handshaked = false;
+  this.data = "";
   
   this.log = server.options.log ? function(message, type){
     log('[client '+ socket.remoteAddress +'] ' + message, type);
@@ -105,7 +100,9 @@ this.Connection = Connection = function(server, socket){
   socket.addListener('eof', function(){ self._onDisconnect(); });
 };
 
-Connection.prototype.onConnect = function(data){   
+Connection.prototype.onConnect = function(data){
+  this.log("Connected", "info")
+    
   this.server._onConnect(this);
 };
 
@@ -118,6 +115,8 @@ Connection.prototype._onReceive = function(data){
 };
 
 Connection.prototype._onDisconnect = function(){
+  this.log("Disconnected", "info")
+    
   if (this.module && this.module.onDisconnect) this.module.onDisconnect(this);
   this.socket.close();
   this.server._onDisconnect(this);
@@ -132,19 +131,23 @@ Connection.prototype.send = function(data){
 };
 
 Connection.prototype._handle = function(data){
-  // utf8 data is in between of a 0x00 byte and a 0xFF byte per spec
-  var match = data.match(dataMatch);
+    this.data += data;
 
-  if (!match){
-    this.log('Data incorrectly framed by UA. Dropping connection');
-    this.socket.close();
-    return false;
-  }
-  
-  var chunks = data.replace(/^(\u0000)|(\ufffd)$/g, '').split('\ufffd\u0000');
-  for (var i = 0, l = chunks.length; i < l; ++i) { 
-    this.module.onData(chunks[i], this);
-  }
+    chunks = this.data.split('\ufffd');
+    chunk_count = chunks.length - 1; // last chunk is either incomplete or ""
+    
+    for (var i = 0; i < chunk_count; i++) {
+        chunk = chunks[i];
+        if (chunk[0] != '\u0000') {
+            this.log('Data incorrectly framed by UA. Dropping connection');
+            this.socket.close();
+            return false;
+        }
+
+        this.module.onData(chunk.slice(1), this);
+    }
+
+    this.data = chunks[chunks.length - 1];
   
   return true;
 };
