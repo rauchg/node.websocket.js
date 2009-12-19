@@ -59,6 +59,10 @@ Server = this.Server = function(options){
     new Connection(self, socket);    
   });
   this.server.listen(this.options.port, this.options.host);
+  
+  if (this.options.log) setInterval(function(){
+    sys.puts('[info] ' + self.clients + ' clients connected', 'info');
+  }, 5000);
 };
 
 Server.prototype._verifyOrigin = function(origin){
