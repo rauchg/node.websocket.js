@@ -30,7 +30,7 @@ var tcp = require('tcp'),
       'Upgrade: WebSocket', 
       'Connection: Upgrade',
       'WebSocket-Origin: {origin}',
-      'WebSocket-Location: ws://{host}{resource}',
+      'WebSocket-Location: {protocol}://{host}{resource}',
       '',
       ''
     ],
@@ -49,7 +49,8 @@ Server = this.Server = function(options){
     host: 'localhost',
     origins: '*',
     log: true,
-    logKey: null
+    logKey: null,
+    tls: false
   }, options || {});
   
   if (this.options.logKey === null) logger.setKey('node.websocket.' + this.options.host + '.' + this.options.port);
@@ -97,6 +98,7 @@ this.Connection = Connection = function(server, socket){
   this.log('Server created', 'info');
   
   var self = this;
+  if (server.options.tls) socket.setSecure();
   socket.setTimeout(0);
   socket.setNoDelay(true); // disabling Nagle's algorithm is encouraged for real time transmissions
   socket.setEncoding('utf8'); // per spec
@@ -110,6 +112,8 @@ Connection.prototype.onConnect = function(data){
 };
 
 Connection.prototype._onReceive = function(data){
+  sys.puts(data);
+  
   if (this.handshaked){   
     this._handle(data);    
   } else {
@@ -193,7 +197,8 @@ Connection.prototype._handshake = function(data){
   this.socket.send(tools.substitute(responseHeaders.join('\r\n'), {
     resource: matches[0],
     host: matches[1],
-    origin: matches[2]
+    origin: matches[2],
+    protocol: this.server.secure ? 'wss' : 'ws'
   }));
   
   this.handshaked = true;
