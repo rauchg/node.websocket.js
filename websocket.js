@@ -168,6 +168,14 @@ Connection.prototype._handshake = function(data){
       module, 
       headers = data.split('\r\n');
   
+  if (headers.length && headers[0].match(/<policy-file-request.*>/)) {
+    // allows Flash based WebSocket implementation to connect.
+    // e.g. http://github.com/gimite/web-socket-js
+    this.log('Flash policy file request');
+    this._serveFlashPolicy();
+    return false;
+  }
+
   for (var i = 0, l = headers.length, match; i < l; i++){
     if (i === requestHeaders.length) break; // handle empty lines that UA send 
     match = headers[i].match(requestHeaders[i]);
@@ -211,4 +219,19 @@ Connection.prototype._handshake = function(data){
   this.handshaked = true;
   this.log('Handshake sent', 'info');
   return true;
+};
+
+Connection.prototype._serveFlashPolicy = function(){
+  var origins = this.server.options.origins;
+  if (!tools.isArray(origins)) {
+    origins = [origins];
+  }
+  this.socket.send('<?xml version="1.0"?>\n');
+  this.socket.send('<!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">\n');
+  this.socket.send('<cross-domain-policy>\n');
+  for (var i = 0, l = origins.length; i < l; i++){
+    this.socket.send('  <allow-access-from domain="' + origins[i] + '" to-ports="' + this.server.options.port + '"/>\n');
+  }
+  this.socket.send('</cross-domain-policy>\n');
+  this.socket.close();
 };
