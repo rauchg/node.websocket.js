@@ -45,6 +45,15 @@ The second parameter received is the `websocket::Connection` instance. To send d
 	this.onData = function(data, connection){
 		connection.send('sending data!');
 	}
+	
+Features
+--------
+
+* Very clean API that you can extend.
+
+* It's easy to handle different resources as modules through Node dependency injection.
+
+* Support for flash policy requests (for flash-based WebSocket emulation for old browsers). Thanks @[joewalnes](http://github.com/joewalnes/)!
   
 Demonstration
 -------------
