@@ -61,7 +61,7 @@ Server = this.Server = function(options){
   this.server.listen(this.options.port, this.options.host);
   
   if (this.options.log) setInterval(function(){
-    sys.puts('[info] ' + self.clients + ' clients connected', 'info');
+    sys.puts('['+ new Date() +'] [info] ' + self.clients + ' clients connected', 'info');
   }, 5000);
 };
 
@@ -113,8 +113,6 @@ Connection.prototype.onConnect = function(data){
 };
 
 Connection.prototype._onReceive = function(data){
-  sys.puts(data);
-  
   if (this.handshaked){   
     this._handle(data);    
   } else {
@@ -139,24 +137,24 @@ Connection.prototype.send = function(data){
 };
 
 Connection.prototype._handle = function(data){
-    this.data += data;
+  this.data += data;
 
-    chunks = this.data.split('\ufffd');
-    chunk_count = chunks.length - 1; // last chunk is either incomplete or ""
-    
-    for (var i = 0; i < chunk_count; i++) {
-        chunk = chunks[i];
-        if (chunk[0] != '\u0000') {
-            this.log('Data incorrectly framed by UA. Dropping connection');
-            this.socket.close();
-            return false;
-        }
-
-        this.module.onData(chunk.slice(1), this);
+  chunks = this.data.split('\ufffd');
+  chunk_count = chunks.length - 1; // last chunk is either incomplete or ""
+  
+  for (var i = 0; i < chunk_count; i++) {
+    chunk = chunks[i];
+    if (chunk[0] != '\u0000') {
+      this.log('Data incorrectly framed by UA. Dropping connection');
+      this.socket.close();
+      return false;
     }
 
-    this.data = chunks[chunks.length - 1];
-  
+    this.module.onData(chunk.slice(1), this);
+  }
+
+  this.data = chunks[chunks.length - 1];
+
   return true;
 };
 
@@ -196,7 +194,8 @@ Connection.prototype._handshake = function(data){
   
   module = './modules' + (matches[0] == '/' ? '/_default' : matches[0]).toLowerCase();
   try {
-    this.module = require(module);
+    var module = require(module);
+    this.module = new module.Module();
   } catch(e){
     this.log('Handshake aborted. Could not stat module file ' + module + '.js' + ' for resource ' + matches[0]);
     this.socket.close();

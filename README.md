@@ -34,17 +34,23 @@ On the client side, initialize a `WebSocket` like this:
 
 `websocket::Connection` will try to load a [module](http://nodejs.org/api.html#_modules) in the modules/ directory with the name of the passed resource (in this case `test`).
 
-If the resource is just / (for example `ws://localhost:8080/`), modules/_default.js will be loaded. The module has to expose an onData function like this
+If the resource is just / (for example `ws://localhost:8080/`), modules/_default.js will be loaded. The module has to expose a `Module` pseudoclass with an onData method like this:
 
-	this.onData = function(data, instance){
+	var Module = this.Module = function(){
+		// constructor;
+	};
+	
+	Module.prototype.onData = function(data, instance){
 		// do something 
 	};
   
 The second parameter received is the `websocket::Connection` instance. To send data back to the client your module should do something like this:
 
-	this.onData = function(data, connection){
+	Module.prototype.onData = function(data, connection){
 		connection.send('sending data!');
 	}
+	
+Additionally, you can implement an `onDisconnect` method, called when a `Connection` finishes.
 	
 Features
 --------
