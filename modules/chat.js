@@ -54,10 +54,10 @@ var Module = this.Module = function(){
     this.broadcast(function(conn) {
 	  var timestamp = new Date();
       return {
-		    'type': "MSG",
+        'type': "MSG",
         'isSelf': (conn.id == connection.id),
         'text': message,
-		    'timestamp': timestamp.toString(),
+        'timestamp': timestamp.toString(),
         'nick': connection.nick
       };
     });
