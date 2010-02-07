@@ -78,6 +78,17 @@ In a different terminal, as described above, run node.webserver.js:
   
 Access test/test.html (which you can run locally or deliver through any web server, such as Apache) and watch true realtime data exchange!
 
+Other Examples
+--------------
+
+The modules folder contains a few more demos:
+
+* echo.js - a basic echo server
+* processes.js - shows the output of a "ps" command every 5 seconds
+* chat.js - a port of the [nodechat](http://github.com/ry/node_chat/) to node.websockets
+
+The try them out, you can use the html fies in test/websockets. Please also note that these integrate [web-socket-js](http://github.com/gimite/web-socket-js) to support non-Chrome browsers. 
+
 TODO
 ----
 
