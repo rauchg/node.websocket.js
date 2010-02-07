@@ -13,10 +13,7 @@ var Module = this.Module = function(){
     this.server.chatConnections.forEach(function(connection) {
      var data = fn(connection);
      connection.send(JSON.stringify(data));
-    })
-    sys = require('sys');
-    
-    sys.puts('['+ new Date() +'] [debug] ' + "Adding to chatHistory: " + JSON.stringify(fn({})));
+    })    
     this.server.chatHistory.push(fn({}));
   };
 
@@ -77,7 +74,6 @@ Module.prototype.onData = function(data, connection){
   // handle the data
   if (data.match(/^NICK /)) {
   	connection.nick = data.substr(5);
-  	// connection.send(['lastMessage', this.lastNMessages(5)]);
   	var historySize = 10;	
   	var history = this.lastNMessages(historySize);
   	for (var i=0; i<historySize; i++) {
