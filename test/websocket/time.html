@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <title>node.websocket.js test</title>
+    
+    <style type="text/css" media="screen">
+      #time { background: #ccc; }
+    </style>
+    <!-- Include these three JS files: -->
+    <script type="text/javascript" src="javascripts/swfobject.js"></script>
+    <script type="text/javascript" src="javascripts/FABridge.js"></script>
+    <script type="text/javascript" src="javascripts/web_socket.js"></script>
+    
+  </head>
+  <body>
+    
+    <h1>What's the time?</h1>
+    
+    <h2>The time is <span id="time">opening socket</span></h2>
+    <p>The information for the time is provided by the server. No Date() or intervals here!</p>
+    
+    <script>
+        // Set URL of your WebSocketMain.swf here:
+        WebSocket.__swfLocation = "flash/WebSocketMain.swf";
+        
+        var webSocket = new WebSocket('ws://localhost:8080/time');
+
+        webSocket.onopen = function(event){
+            document.getElementById('time').innerHTML = 'waiting for socket';
+            webSocket.send('start');
+        };
+
+        webSocket.onmessage = function(event){
+            var object = JSON.parse(event.data);
+            document.getElementById('time').innerHTML = object.time;
+        };
+
+        webSocket.onclose = function(event){
+            document.getElementById('time').innerHTML = 'socket closed';
+        };
+    </script>
+    
+  </body>
+</html>

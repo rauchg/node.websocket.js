@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Processes</title>
+    
+    <style type="text/css" media="screen">
+      #time { background: #ccc; }
+    </style>
+    <!-- Include these three JS files: -->
+    <script type="text/javascript" src="javascripts/swfobject.js"></script>
+    <script type="text/javascript" src="javascripts/FABridge.js"></script>
+    <script type="text/javascript" src="javascripts/web_socket.js"></script>
+    
+  </head>
+  <body>
+    
+    <h1>Processes</h1>
+    
+    
+    <div id="processes"></div>
+    
+    <script>
+        // Set URL of your WebSocketMain.swf here:
+        WebSocket.__swfLocation = "flash/WebSocketMain.swf";
+        
+        var webSocket = new WebSocket('ws://localhost:8080/processes');
+
+        webSocket.onopen = function(event){
+            document.getElementById('processes').innerHTML = 'waiting for socket...';
+            webSocket.send("start");
+        };
+
+        webSocket.onmessage = function(event){
+            var data = "<pre>" + event.data + "</pre>";
+            document.getElementById('processes').innerHTML = data;
+        };
+
+        webSocket.onclose = function(event){
+            document.getElementById('processes').innerHTML = 'socket closed';
+        };
+        
+    </script>
+    
+  </body>
+</html>

@@ -1,0 +1,70 @@
+body {
+  background-color: #ccc;
+  font-family: Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 24px;
+  
+}
+
+#header {
+  padding: 20px 15px;
+}
+
+div#connect {
+  padding: 20px;
+  margin: 50px auto;
+  width: 400px;
+  background-color: #FFF;
+}
+
+#chat {
+  background-color: #FFF;
+  font-family: courier, monospace;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 70px;
+  overflow: hidden;
+}
+
+#chat td {
+  vertical-align: top;
+}
+
+#toolbar {
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+}
+#toolbar ul li {
+  font-family: courier, monospace;
+  font-size: 12px;
+  list-style: none;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  color: #FFF;
+}
+
+#toolbar ul {
+  margin: 0;
+  padding: 3px 5px;
+  background-color: #33AA33;
+  margin: 0 0 3px 0;
+}
+
+a#usersLink {
+  color: #FFF;
+}
+
+#entry {
+  width: 100%;
+  margin: 0 0 3px;
+  padding: 0 20px 0 5px;
+  clear: both;
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chat</title>
+    
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.0.0?>/build/cssreset/reset-min.css">
+    
+    <link href="stylesheets/chat.css" rel="stylesheet" type="text/css" />
+    <!-- Include these three JS files: -->
+    <script type="text/javascript" src="javascripts/swfobject.js"></script>
+    <script type="text/javascript" src="javascripts/FABridge.js"></script>
+    <script type="text/javascript" src="javascripts/web_socket.js"></script>
+    <script type="text/javascript" src="javascripts/jquery.js"></script>
+    <script type="text/javascript" src="javascripts/chat_client.js"></script>
+    
+  </head>
+  <body>
+
+    <div id="header">
+      <h1>Chat Room</h1>
+      <div id="flash"></div>
+    </div>
+    <!-- the connect screen - it will be shown first -->
+    <div id="connect">
+        <p>Please choose a Nickname to join the room.</p>
+        <form id='login_form'>
+              <label for="nick">Nick:</label>
+              <input id='nick' type='text'  />
+              <input id="connect" class="button" type="submit" value="join"/>
+        </form>    
+    </div>
+    <!-- /connect -->
+    
+    <!-- loading screen -->
+    <div id="loading">I'm loading the chatroom...</div>
+    <!-- /loading -->
+    
+    <!-- chatroom -->
+    <div id="chatroom">
+        <table id="chat"></table>
+        <div id="toolbar">
+            <ul id="status">
+              <li class="date" id="currentTime"></li>
+              <li class="nick">nick</li>
+              <li><a id="usersLink" href="#">Users</a></li>
+            </ul>
+            <input id='entry' type='text'  />
+        </div>
+    </div>
+    <!-- /chatroom -->
+  </body>
+</html>
