@@ -74,18 +74,19 @@ Module.prototype.onData = function(data, connection){
   // handle the data
   if (data.match(/^NICK /)) {
   	connection.nick = data.substr(5);
-  	var historySize = 10;	
-  	var history = this.lastNMessages(historySize);
-  	for (var i=0; i<historySize; i++) {
-  	  connection.log(JSON.stringify(history[i]));
-  	  connection.send(JSON.stringify(history[i]));
-  	}
   	this.broadcast(function(conn) {
 		  var timestamp = new Date();
       return { 'nick': connection.nick, 
                'type': 'JOIN', 
                'timestamp': timestamp.toString() };
 	    });
+	    
+	  // send last 10 messages to client
+  	var historySize = 10;	
+  	var history = this.lastNMessages(historySize);
+  	for (var i=0; i< history.length; i++) {
+  	  connection.send(JSON.stringify(history[i]));
+  	}
   	this.addConnection(connection);
   	connection.send(JSON.stringify({'type': "RPL_WELCOME"}));
 	
