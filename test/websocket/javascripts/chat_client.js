@@ -36,6 +36,9 @@ function userPart(nick, timestamp) {
   updateUsersLink();
 }
 
+function setTopic(topic) {
+  $("#topic").text(topic);
+}
 
 
 // Screen states
@@ -57,10 +60,8 @@ function showChat (nick) {
   $("#toolbar .nick").text("[" + CONFIG.nick + "]");
   $("#chatroom").show();
   $("#entry").focus();
- 
   $("#connect").hide();
   $("#loading").hide();
- 
   scrollDown();
 }
 
@@ -91,6 +92,10 @@ util = {
   isBlank: function(text) {
     var blank = /^\s*$/;
     return (text.match(blank) !== null);
+  },
+  
+  trim: function(text) {
+    return text.replace(/^\s+|\s+$/g, '') ;
   }
 };
 
@@ -106,45 +111,43 @@ function outputUsers () {
 }
 
 function addMessage (from, text, time, _class) {
-	if (text === null) {
-		return;
-	}
-		
-	if (time == null) {
-		// if the time is null or undefined, use the current time
-		time = new Date();
-	} else if ((time instanceof Date) === false) {
-		// if it is a timestamp, interpret it
-		time = new Date(time); 
-	}
+  if (text === null) {
+  	return;
+  }
 	
-	var messageElement = $(document.createElement("tr"));
-	
-	messageElement.addClass("message");
-	if (_class) {
-		messageElement.addClass(_class);
-	}
-	
-	// sanitize
-	text = util.toStaticHTML(text);
-	
-	// see if it matches our nick?
-	var nick_re = new RegExp(CONFIG.nick);
-	if (nick_re.exec(text)) {
-		// if so, highlight
-		messageElement.addClass("personal");
-	}
-	
-	// replace URLs with links
-    text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
-  
-	var content = '<tr>'
-	              + '  <td class="date">' + util.timeString(time) + '</td>'
-	              + '  <td class="nick">' + util.toStaticHTML(from) + '</td>'
-	              + '  <td class="msg-text">' + text  + '</td>'
-	              + '</tr>'
-	              ;
-	messageElement.html(content);
+  if (time == null) {
+  	// if the time is null or undefined, use the current time
+  	time = new Date();
+  } else if ((time instanceof Date) === false) {
+  	// if it is a timestamp, interpret it
+  	time = new Date(time); 
+  }
+
+  var messageElement = $(document.createElement("tr"));
+  messageElement.addClass("message");
+  if (_class) {
+  	messageElement.addClass(_class);
+  }
+
+  // sanitize
+  text = util.toStaticHTML(text);
+
+  // see if it matches our nick?
+  var nick_re = new RegExp(CONFIG.nick);
+  if (nick_re.exec(text)) {
+  	// if so, highlight
+  	messageElement.addClass("personal");
+  }
+
+  // replace URLs with links
+     text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
+  var content = '<tr>'
+                + '  <td class="date">' + util.timeString(time) + '</td>'
+                + '  <td class="nick">' + util.toStaticHTML(from) + '</td>'
+                + '  <td class="msg-text">' + text  + '</td>'
+                + '</tr>'
+                ;
+  messageElement.html(content);
 
   $("#chat").append(messageElement);
   scrollDown();
@@ -179,6 +182,9 @@ function connectSocket() {
       case "MSG":
         addMessage(object.nick, object.text, object.timestamp);  
         break;
+      case "ACTION":
+        addMessage(object.nick, object.text, object.timestamp, "action");  
+        break;
       case "JOIN":
         userJoin(object.nick, object.timestamp);
         break;
@@ -189,7 +195,10 @@ function connectSocket() {
         nicks = object.nicks;
         updateUsersLink();
         break;
-        
+      case "TOPIC":
+        setTopic(object.text);
+        addMessage(object.nick, "set the topic to " + object.text, object.timestamp, "notice");
+        break;
     }
 
   };
@@ -205,16 +214,43 @@ function connectSocket() {
 $(document).ready(function() {
   
   // Event Handlers
-  
+  // USER INPUT message
   $('#entry').keypress(function (e) {
     if (e.keyCode != 13 /* Return */) return;
-    var msg = $("#entry").attr("value").replace("\n", "");
-    if (!util.isBlank(msg)) webSocket.send("MSG " + msg );
+    var msg = util.trim($("#entry").attr("value").replace("\n", ""));
+    if (!util.isBlank(msg)) {
+      // Check if it's a command
+      if (msg[0] == "/") {
+        command = msg.split(" ")[0].substr(1);
+        argument = msg.substr(command.length + 2);
+        switch (command.toUpperCase()) {
+          case "ME":
+            if (argument.length) {
+              webSocket.send("ACTION " + argument);
+            }
+            break;
+          case "TOPIC":
+            if (argument.length) {
+              webSocket.send("TOPIC " + argument);
+            }
+            break;
+          case "QUIT":
+            webSocket.send("PART");
+            break;
+          case "WHO":
+            who();
+        }
+      } else {
+        webSocket.send("MSG " + msg );
+      }
+    }
     $("#entry").attr("value", ""); // clear the entry field
   });
   
+  // UPDATE USERS STRING
   $('#usersLink').click(outputUsers);
   
+  // user login
   $('#login_form').submit(function() {
     var nick = $('#nick').attr("value");
     // validate nick length
@@ -229,7 +265,6 @@ $(document).ready(function() {
       showConnect();
       return false;
     }
-    
     // all is fine, let's proceed
     CONFIG.nick = nick;
     connectSocket();
@@ -244,6 +279,6 @@ $(document).ready(function() {
   }, 1000);
   
   
-  // prep the screen
+  // First thing, prep the screen
   showConnect();
 });

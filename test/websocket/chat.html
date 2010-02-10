@@ -17,11 +17,11 @@
   <body>
 
     <div id="header">
-      <h1>Chat Room</h1>
       <div id="flash"></div>
     </div>
     <!-- the connect screen - it will be shown first -->
     <div id="connect">
+      <h1>Chat Room</h1>
         <p>Please choose a Nickname to join the room.</p>
         <form id='login_form'>
               <label for="nick">Nick:</label>
@@ -37,6 +37,7 @@
     
     <!-- chatroom -->
     <div id="chatroom">
+		<h2 id="topic"></h2>
         <table id="chat"></table>
         <div id="toolbar">
             <ul id="status">

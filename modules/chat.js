@@ -59,6 +59,31 @@ var Module = this.Module = function(){
       };
     });
   };
+  
+  this.action = function(connection, action) {
+    this.broadcast(function(conn) {
+	  var timestamp = new Date();
+      return {
+        'type': "ACTION",
+        'isSelf': (conn.id == connection.id),
+        'text': action,
+        'timestamp': timestamp.toString(),
+        'nick': connection.nick
+      };
+    });
+  };
+  
+  this.topic = function(connection, topic) {
+    this.broadcast(function(conn) {
+      var timestamp = new Date();
+        return {
+          'type': "TOPIC",
+          'text': topic,
+          'timestamp': timestamp.toString(),
+          'nick': connection.nick
+        }
+    });
+  }
 };
 
 Module.prototype.onData = function(data, connection){
@@ -68,9 +93,11 @@ Module.prototype.onData = function(data, connection){
   if (typeof(this.server.chatConnections) == "undefined") {
     this.server.chatConnections    = [];
     this.server.chatHistory        = [];
+    this.server.chatTopic          = "Chat Room";
+    this.server.chatTopicUser      = "System";
     this.server.nextIdToAssign = 0;
   }
-  
+
   // handle the data
   if (data.match(/^NICK /)) {
   	connection.nick = data.substr(5);
@@ -87,6 +114,12 @@ Module.prototype.onData = function(data, connection){
   	for (var i=0; i< history.length; i++) {
   	  connection.send(JSON.stringify(history[i]));
   	}
+  	// send topic
+  	connection.send(JSON.stringify({
+  	          'type': "TOPIC",
+  	          'nick':  this.server.chatTopicUser,
+  	          'topic': this.server.chatTopic
+  	  }));
   	this.addConnection(connection);
   	connection.send(JSON.stringify({'type': "RPL_WELCOME"}));
 	
@@ -95,12 +128,25 @@ Module.prototype.onData = function(data, connection){
   	message = data.substr(4);
   	this.say(connection, message);
   }
+  if (data.match(/^ACTION /)) {
+  	action = data.substr(7);
+    this.action(connection, action);
+  }
   if (data.match(/^USERS/)) {
   	var users = new Array;
   	for(var i=0; i< this.server.chatConnections.length; i++) {
   		users.push(this.server.chatConnections[i]['nick']);
   	}
   	connection.send(JSON.stringify({'type': "RPL_USERS", 'nicks': users}));
+  }
+  if (data.match(/^TOPIC /)) {
+    topic = data.substr(6);
+    this.server.chatTopic = topic;
+    this.server.chatTopicUser = connection.nick;
+    this.topic(connection, topic) 
+  }
+  if (data.match(/^PART/)) {
+    connection.socket.close();
   }
 	
 };

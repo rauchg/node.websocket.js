@@ -34,6 +34,16 @@ div#connect {
   vertical-align: top;
 }
 
+.action {
+  font-style: italic;
+  color: #CCC;
+}
+
+.notice {
+  color: #CAA;
+}
+
+
 #toolbar {
   bottom: 0;
   margin: 0;
