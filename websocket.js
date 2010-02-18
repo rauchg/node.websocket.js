@@ -102,8 +102,8 @@ this.Connection = Connection = function(server, socket){
   socket.setNoDelay(true); // disabling Nagle's algorithm is encouraged for real time transmissions
   socket.setEncoding('utf8'); // per spec
   socket.addListener('connect', function(){ self.onConnect(); });
-  socket.addListener('receive', function(data){ self._onReceive(data); });
-  socket.addListener('eof', function(){ self._onDisconnect(); });
+  socket.addListener('data', function(data){ self._onData(data); });
+  socket.addListener('end', function(){ self._onDisconnect(); });
 };
 
 Connection.prototype.onConnect = function(data){
@@ -112,7 +112,7 @@ Connection.prototype.onConnect = function(data){
   this.server._onConnect(this);
 };
 
-Connection.prototype._onReceive = function(data){
+Connection.prototype._onData = function(data){
   if (this.handshaked){   
     this._handle(data);    
   } else {
@@ -130,7 +130,7 @@ Connection.prototype._onDisconnect = function(){
 
 Connection.prototype.send = function(data){
   try {
-    this.socket.send('\u0000' + data + '\uffff');
+    this.socket.write('\u0000' + data + '\uffff');
   } catch(e) {
     this.socket.close();
   }  
@@ -208,7 +208,7 @@ Connection.prototype._handshake = function(data){
     return false;
   }
   
-  this.socket.send(tools.substitute(responseHeaders.join('\r\n'), {
+  this.socket.write(tools.substitute(responseHeaders.join('\r\n'), {
     resource: matches[0],
     host: matches[1],
     origin: matches[2],
@@ -225,12 +225,12 @@ Connection.prototype._serveFlashPolicy = function(){
   if (!tools.isArray(origins)) {
     origins = [origins];
   }
-  this.socket.send('<?xml version="1.0"?>\n');
-  this.socket.send('<!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">\n');
-  this.socket.send('<cross-domain-policy>\n');
+  this.socket.write('<?xml version="1.0"?>\n');
+  this.socket.write('<!DOCTYPE cross-domain-policy SYSTEM "http://www.macromedia.com/xml/dtds/cross-domain-policy.dtd">\n');
+  this.socket.write('<cross-domain-policy>\n');
   for (var i = 0, l = origins.length; i < l; i++){
-    this.socket.send('  <allow-access-from domain="' + origins[i] + '" to-ports="' + this.server.options.port + '"/>\n');
+    this.socket.write('  <allow-access-from domain="' + origins[i] + '" to-ports="' + this.server.options.port + '"/>\n');
   }
-  this.socket.send('</cross-domain-policy>\n');
+  this.socket.write('</cross-domain-policy>\n');
   this.socket.close();
 };
