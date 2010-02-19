@@ -9,7 +9,7 @@ Requirements
 ------------
 
 
-* [Node.js](http://nodejs.org/) (tested with v0.1.21)
+* [Node.js](http://nodejs.org/) (*requires* v0.1.29+!)
 
 Optional:
 
