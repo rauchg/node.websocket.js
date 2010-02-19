@@ -100,3 +100,5 @@ Author
 ------
 
 Guillermo Rauch <[http://devthought.com](http://devthought.com)>
+
+Special thanks to [Riccardo Cambiassi]<http://github.com/bru> for his work on the chat example and API changes.
