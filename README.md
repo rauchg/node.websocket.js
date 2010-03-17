@@ -1,3 +1,5 @@
+*Update*: For a more complete solution, I recommend you look into [Socket.IO](http://github.com/RosePad/Socket.IO) and [Socket.IO-node](http://github.com/RosePad/Socket.IO-node).
+
 node.websocket.js
 =================
 
